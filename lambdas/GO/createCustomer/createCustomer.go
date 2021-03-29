@@ -74,7 +74,9 @@ func createResponse(code string, descrip string, customer *customers.Customer) s
 	resp := Result{
 		Code:        code,
 		Description: descrip,
-		Data:        *customer,
+	}
+	if customer != nil {
+		resp.Data = *customer
 	}
 
 	data, _ := json.Marshal(resp)

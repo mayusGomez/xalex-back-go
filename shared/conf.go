@@ -1,7 +1,8 @@
 package shared
 
 const (
-	DBName = "xalex"
+	DBName = "xalexApp"
 
 	CustommerCollection = "customer"
+	UserCollection      = "user"
 )

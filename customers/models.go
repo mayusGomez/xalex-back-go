@@ -34,16 +34,16 @@ type Location struct {
 
 // Customer Model of data
 type Customer struct {
-	IDmgo           primitive.ObjectID `bson:"_id"`
+	IDmgo           primitive.ObjectID `bson:"_id" json:"-"`
 	ID              string             `json:"id,omitempty" bson:"-"`
-	Name            string             `json:"name,omitempty"`
-	LastName        string             `json:"last_name,omitempty"`
-	MainMobilePhone string             `json:"main_mobile_phone,omitempty"`
-	AuxMobilePhone  []AuxMobilePhone   `json:"aux_mobile_phone,omitempty"`
-	Email           string             `json:"email,omitempty"`
-	IDType          string             `json:"id_type,omitempty"`
-	IDNumber        string             `json:"id_number,omitempty"`
-	Segment         string             `json:"segment,omitempty"`
-	Location        Location           `json:"location,omitempty"`
-	Notes           []Notes            `json:"notes,omitempty"`
+	Name            string             `json:"name,omitempty" bson:"name"`
+	LastName        string             `json:"last_name,omitempty" bson:"last_name,omitempty"`
+	MainMobilePhone string             `json:"main_mobile_phone,omitempty" bson:"main_mobile_phone,omitempty"`
+	AuxMobilePhone  []AuxMobilePhone   `json:"aux_mobile_phone,omitempty" bson:"aux_mobile_phone,omitempty"`
+	Email           string             `json:"email,omitempty" bson:"email,omitempty"`
+	IDType          string             `json:"id_type,omitempty" bson:"id_type,omitempty"`
+	IDNumber        string             `json:"id_number,omitempty" bson:"id_number,omitempty"`
+	Segment         string             `json:"segment,omitempty" bson:"segment,omitempty"`
+	Location        *Location          `json:"location,omitempty" bson:"location,omitempty"`
+	Notes           []Notes            `json:"notes,omitempty" bson:"notes,omitempty"`
 }

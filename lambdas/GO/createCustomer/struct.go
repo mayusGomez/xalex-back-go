@@ -5,7 +5,7 @@ import (
 )
 
 type Result struct {
-	Code        string
-	Description string
-	Data        customers.Customer
+	Code        string             `json:"code,omitempty"`
+	Description string             `json:"description,omitempty"`
+	Data        customers.Customer `json:"data,omitempty"`
 }
