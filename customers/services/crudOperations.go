@@ -36,3 +36,13 @@ func CreateUser(customer *customers.Customer, s storage.Storage) error {
 	return nil
 
 }
+
+func GetByPage(IDUser, filterField, fielterData string, pageNumber, pageSize int, s storage.Storage) ([]customers.Customer, error) {
+
+	users, err := s.GetByPage(IDUser, filterField, fielterData, pageNumber, pageSize)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	return users, nil
+}

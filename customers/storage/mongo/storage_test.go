@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -54,6 +55,7 @@ func TestMongoStorage_Create(t *testing.T) {
 	notes = append(notes, not01)
 
 	customer := customers.Customer{
+		IDUser:          "auth0|605fb236abbbeb006878e277",
 		Name:            "Alexander",
 		LastName:        "Gomez",
 		MainMobilePhone: "3209876543",
@@ -62,7 +64,7 @@ func TestMongoStorage_Create(t *testing.T) {
 		IDType:          "CC",
 		IDNumber:        "888888888",
 		Segment:         "Other",
-		Location: customers.Location{
+		Location: &customers.Location{
 			Country: "COP",
 			City:    "Bogota",
 			Address: "Calle 45 # 56-44",
@@ -98,6 +100,80 @@ func TestMongoStorage_Create(t *testing.T) {
 			}
 			if err := s.Create(tt.args.customer); (err != nil) != tt.wantErr {
 				t.Errorf("MongoStorage.Create() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestMongoStorage_GetByPage(t *testing.T) {
+	strConn := os.Getenv("STR_MONGO_CONN")
+	log.Println("strConn:", strConn)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	client, err := shared.GetMongoConn(strConn, ctx)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer client.Disconnect(ctx)
+
+	type fields struct {
+		StringConn string
+		Client     *mongo.Client
+		Context    context.Context
+	}
+	type args struct {
+		IDUser        string
+		filterField   string
+		filterPattern string
+		pageNumber    int64
+		pageSize      int64
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    []customers.Customer
+		wantErr bool
+	}{
+		{
+			name: "TestMongoStorage_GetByPage ok by name",
+			fields: fields{
+				StringConn: strConn,
+				Client:     client,
+				Context:    ctx,
+			},
+			args: args{
+				IDUser:        "auth0|605fb236abbbeb006878e277",
+				filterField:   "name",
+				filterPattern: "a",
+				pageNumber:    1,
+				pageSize:      2,
+			},
+			want: []customers.Customer{
+				customers.Customer{
+					Name: "ALEXANDER",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &MongoStorage{
+				StringConn: tt.fields.StringConn,
+				Client:     tt.fields.Client,
+				Context:    tt.fields.Context,
+			}
+			got, err := s.GetByPage(tt.args.IDUser, tt.args.filterField, tt.args.filterPattern, tt.args.pageNumber, tt.args.pageSize)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("MongoStorage.GetByPage() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("MongoStorage.GetByPage() = %v, want %v", got, tt.want)
 			}
 		})
 	}
