@@ -37,8 +37,23 @@ func (s *MongoStorage) Disconnect() {
 }
 
 // Get customer data by ID
-func (s *MongoStorage) Get(idUser string, idCustomer string) (customers.Customer, error) {
+func (s *MongoStorage) Get(idCustomer string) (customers.Customer, error) {
 	var customer customers.Customer
+	db := s.Client.Database(shared.DBName)
+	coll := db.Collection(shared.CustommerCollection)
+
+	objId, err := primitive.ObjectIDFromHex(idCustomer)
+	if err != nil {
+		log.Fatal(err)
+		return customers.Customer{}, err
+	}
+
+	filter := bson.M{"_id": objId}
+	err = coll.FindOne(s.Context, filter).Decode(&customer)
+	if err != nil {
+		log.Fatal(err)
+		return customers.Customer{}, err
+	}
 
 	return customer, nil
 }
@@ -55,6 +70,7 @@ func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, page
 	findOpts := options.Find()
 	findOpts.SetSkip(skips)
 	findOpts.SetLimit(pageSize)
+	findOpts.SetSort(bson.D{{"name", 1}})
 
 	filter := bson.D{{"id_user", IDUser}}
 	if filterField != "" && filterPattern != "" {
@@ -99,4 +115,8 @@ func (s *MongoStorage) Create(customer *customers.Customer) error {
 	customer.ID = objectID.Hex()
 
 	return err
+}
+
+func (s *MongoStorage) Update(customer *customers.Customer) error {
+	return nil
 }
