@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -26,8 +27,8 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 
 	if len(request.Body) == 0 {
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse("0003", "No data provided", nil),
-			StatusCode: 200,
+			Body:       createResponse(&customers.Customer{}),
+			StatusCode: http.StatusBadRequest,
 		}, nil
 	}
 
@@ -36,8 +37,8 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse("0002", "Eror, request with wrong structure", nil),
-			StatusCode: 200,
+			Body:       createResponse(&customers.Customer{}),
+			StatusCode: http.StatusBadRequest,
 		}, nil
 	}
 
@@ -52,8 +53,8 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse("0001", "Processing Error", nil),
-			StatusCode: 200,
+			Body:       createResponse(&customers.Customer{}),
+			StatusCode: http.StatusInternalServerError,
 		}, nil
 	}
 	defer storage.Disconnect()
@@ -62,28 +63,20 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse("0001", "Processing Error", nil),
-			StatusCode: 200,
+			Body:       createResponse(&customers.Customer{}),
+			StatusCode: http.StatusInternalServerError,
 		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
-		Body:       createResponse("0000", "OK", &customer),
-		StatusCode: 200,
+		Body:       createResponse(&customer),
+		StatusCode: http.StatusOK,
 	}, nil
 }
 
-func createResponse(code string, descrip string, customer *customers.Customer) string {
+func createResponse(customer *customers.Customer) string {
 
-	resp := Result{
-		Code:        code,
-		Description: descrip,
-	}
-	if customer != nil {
-		resp.Data = *customer
-	}
-
-	data, _ := json.Marshal(resp)
+	data, _ := json.Marshal(customer)
 	return string(data)
 
 }

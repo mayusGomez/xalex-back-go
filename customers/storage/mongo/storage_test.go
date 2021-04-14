@@ -274,7 +274,7 @@ func TestMongoStorage_Get(t *testing.T) {
 				Client:     tt.fields.Client,
 				Context:    tt.fields.Context,
 			}
-			got, err := s.Get(tt.args.idUser, tt.args.idCustomer)
+			got, err := s.Get(tt.args.idCustomer)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MongoStorage.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
