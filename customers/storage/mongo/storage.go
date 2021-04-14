@@ -82,8 +82,8 @@ func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, page
 
 	cur, err := coll.Find(s.Context, filter, findOpts)
 	if err != nil {
-		log.Fatal(err)
-		return nil, err
+		log.Println("Error, Find:", err)
+		return []customers.Customer{}, nil
 	}
 
 	for cur.Next(s.Context) {
