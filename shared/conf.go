@@ -5,4 +5,5 @@ const (
 
 	CustommerCollection = "customer"
 	UserCollection      = "user"
+	ServiceCollection   = "service"
 )

@@ -58,6 +58,13 @@ func (s *MongoStorage) Get(idCustomer string) (customers.Customer, error) {
 		return customers.Customer{}, nil
 	}
 
+	if customer.IDUser == "" {
+		log.Println("Error, No idUser in data returned")
+		return customers.Customer{}, nil
+	}
+
+	customer.ID = customer.IDmgo.Hex()
+
 	return customer, nil
 }
 

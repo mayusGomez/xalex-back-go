@@ -106,6 +106,7 @@ func TestMongoStorage_Create(t *testing.T) {
 }
 
 func TestMongoStorage_GetByPage(t *testing.T) {
+	return
 	strConn := os.Getenv("STR_MONGO_CONN")
 	log.Println("strConn:", strConn)
 
