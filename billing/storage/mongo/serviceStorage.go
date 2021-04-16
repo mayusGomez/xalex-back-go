@@ -2,6 +2,8 @@ package mongo
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"log"
 
 	"github.com/mayusGomez/xalex/billing"
@@ -10,6 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type ServiceMongoStorage struct {
@@ -64,4 +67,100 @@ func (s *ServiceMongoStorage) Get(idService string) (billing.Service, error) {
 	service.ID = service.IDmgo.Hex()
 
 	return service, nil
+}
+
+func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Service, error) {
+
+	db := s.Client.Database(shared.DBName)
+	coll := db.Collection(shared.ServiceCollection)
+
+	skips := pageSize * (pageNumber - 1)
+
+	var services []billing.Service
+	findOpts := options.Find()
+	findOpts.SetSkip(skips)
+	findOpts.SetLimit(pageSize)
+	findOpts.SetSort(bson.D{{"Description", 1}})
+
+	filter := bson.D{{"id_user", IDUser}, {"Status", billing.ActiveServStatus}}
+	if filterField != "" && filterPattern != "" {
+		filter = append(filter, bson.E{filterField, primitive.Regex{Pattern: filterPattern, Options: ""}})
+	}
+
+	cur, err := coll.Find(s.Context, filter, findOpts)
+	if err != nil {
+		log.Println("Error, Find:", err)
+		return []billing.Service{}, nil
+	}
+
+	for cur.Next(s.Context) {
+		var service billing.Service
+		err = cur.Decode(&service)
+		if err != nil {
+			log.Fatal(err)
+			continue
+		}
+		service.ID = service.IDmgo.Hex()
+		services = append(services, service)
+	}
+
+	return services, nil
+}
+
+func (s *ServiceMongoStorage) Create(service *billing.Service) error {
+
+	db := s.Client.Database(shared.DBName)
+	coll := db.Collection(shared.ServiceCollection)
+
+	service.IDmgo = primitive.NewObjectID()
+	result, err := coll.InsertOne(s.Context, service)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	// ID of the inserted document.
+	objectID := result.InsertedID.(primitive.ObjectID)
+	fmt.Println(objectID)
+	service.ID = objectID.Hex()
+
+	return err
+}
+
+func (s *ServiceMongoStorage) Update(service *billing.Service) error {
+
+	db := s.Client.Database(shared.DBName)
+	coll := db.Collection(shared.ServiceCollection)
+	var err error
+
+	if service.ID == "" {
+		log.Fatal("Error: when try to update Service, no ID received")
+		return errors.New("Error: when try to update Service, no ID received")
+	}
+
+	service.IDmgo, err = primitive.ObjectIDFromHex(service.ID)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+
+	_, err = coll.UpdateOne(
+		s.Context,
+		bson.M{"_id": service.IDmgo},
+		bson.D{
+			{"$set", bson.D{
+				{"id_user", service.IDUser},
+				{"description", service.Description},
+				{"price", service.Price},
+				{"cost", service.Cost},
+				{"status", service.Status},
+			}},
+		},
+	)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	return nil
 }

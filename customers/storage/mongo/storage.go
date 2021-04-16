@@ -100,6 +100,7 @@ func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, page
 			log.Fatal(err)
 			continue
 		}
+		customer.ID = customer.IDmgo.Hex()
 		customersList = append(customersList, customer)
 	}
 

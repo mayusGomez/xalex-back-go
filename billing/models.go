@@ -7,13 +7,20 @@ import (
 )
 
 const (
-	CancelAppointStatus   = 0
-	PendingAppointStatus  = 1
-	ExecutedAppointStatus = 2
+	InactiveServStatus ServiceStatus = 0
+	ActiveServStatus   ServiceStatus = 1
 
-	AppointmentEvent = 0
-	BillingEvent     = 1
+	CancelAppointStatus   EventStatus = 0
+	PendingAppointStatus  EventStatus = 1
+	ExecutedAppointStatus EventStatus = 2
+
+	AppointmentEvent EventType = 0
+	BillingEvent     EventType = 1
 )
+
+type EventStatus int
+type ServiceStatus int
+type EventType int
 
 type Service struct {
 	IDmgo       primitive.ObjectID `bson:"_id" json:"-"`
@@ -22,7 +29,7 @@ type Service struct {
 	Description string             `json:"description,omitempty"`
 	Price       int                `json:"price,omitempty"`
 	Cost        int                `json:"cost,omitempty"`
-	Status      bool               `json:"status,omitempty"`
+	Status      ServiceStatus      `json:"status,omitempty"`
 }
 
 type DetailService struct {
@@ -46,11 +53,11 @@ type Event struct {
 	ID           string             `json:"id,omitempty" bson:"-"`
 	IDUser       string             `json:"id_user,omitempty" bson:"id_user,omitempty"`
 	Customer     EventCustomer      `json:"customer,omitempty"`
-	EventType    int                `json:"event_type,omitempty"`
+	EventType    EventType          `json:"event_type,omitempty"`
 	Datetime     time.Time          `json:"datetime,omitempty"`
 	RegisterDate time.Time          `json:"register_date,omitempty"`
 	Professional string             `json:"professional,omitempty"`
-	Status       string             `json:"status,omitempty"`
+	Status       EventStatus        `json:"status,omitempty"`
 	Note         string             `json:"note,omitempty"`
 	Services     []DetailService    `json:"services,omitempty"`
 }
