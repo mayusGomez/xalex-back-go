@@ -24,6 +24,7 @@ func main() {
 func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 
 	serviceId := request.PathParameters["serviceId"]
+	userId := request.QueryStringParameters["userId"]
 	log.Printf("request.serviceId: %+v", serviceId)
 
 	if serviceId == "" {
@@ -50,7 +51,7 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	}
 	defer storage.Disconnect()
 
-	service, err := services.GetService(serviceId, &storage)
+	service, err := services.GetService(userId, serviceId, &storage)
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{

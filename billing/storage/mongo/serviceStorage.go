@@ -41,8 +41,8 @@ func (s *ServiceMongoStorage) Disconnect() {
 func (s *ServiceMongoStorage) Get(idService string) (billing.Service, error) {
 
 	var service billing.Service
-	db := s.Client.Database(shared.DBName)
-	coll := db.Collection(shared.ServiceCollection)
+	db := s.Client.Database(billing.DBName)
+	coll := db.Collection(billing.ServiceCollection)
 
 	log.Println("Transform ObjectIDFromHex")
 	objId, err := primitive.ObjectIDFromHex(idService)
@@ -71,8 +71,8 @@ func (s *ServiceMongoStorage) Get(idService string) (billing.Service, error) {
 
 func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Service, error) {
 
-	db := s.Client.Database(shared.DBName)
-	coll := db.Collection(shared.ServiceCollection)
+	db := s.Client.Database(billing.DBName)
+	coll := db.Collection(billing.ServiceCollection)
 
 	skips := pageSize * (pageNumber - 1)
 
@@ -80,9 +80,9 @@ func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern strin
 	findOpts := options.Find()
 	findOpts.SetSkip(skips)
 	findOpts.SetLimit(pageSize)
-	findOpts.SetSort(bson.D{{"Description", 1}})
+	findOpts.SetSort(bson.D{{"description", 1}})
 
-	filter := bson.D{{"id_user", IDUser}, {"Status", billing.ActiveServStatus}}
+	filter := bson.D{{"id_user", IDUser}, {"status", billing.ActiveServStatus}}
 	if filterField != "" && filterPattern != "" {
 		filter = append(filter, bson.E{filterField, primitive.Regex{Pattern: filterPattern, Options: ""}})
 	}
@@ -109,8 +109,8 @@ func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern strin
 
 func (s *ServiceMongoStorage) Create(service *billing.Service) error {
 
-	db := s.Client.Database(shared.DBName)
-	coll := db.Collection(shared.ServiceCollection)
+	db := s.Client.Database(billing.DBName)
+	coll := db.Collection(billing.ServiceCollection)
 
 	service.IDmgo = primitive.NewObjectID()
 	result, err := coll.InsertOne(s.Context, service)
@@ -129,8 +129,8 @@ func (s *ServiceMongoStorage) Create(service *billing.Service) error {
 
 func (s *ServiceMongoStorage) Update(service *billing.Service) error {
 
-	db := s.Client.Database(shared.DBName)
-	coll := db.Collection(shared.ServiceCollection)
+	db := s.Client.Database(billing.DBName)
+	coll := db.Collection(billing.ServiceCollection)
 	var err error
 
 	if service.ID == "" {
@@ -151,8 +151,8 @@ func (s *ServiceMongoStorage) Update(service *billing.Service) error {
 			{"$set", bson.D{
 				{"id_user", service.IDUser},
 				{"description", service.Description},
-				{"price", service.Price},
-				{"cost", service.Cost},
+				{"price", service.PriceInt},
+				{"cost", service.CostInt},
 				{"status", service.Status},
 			}},
 		},

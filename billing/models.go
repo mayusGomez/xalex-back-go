@@ -27,15 +27,19 @@ type Service struct {
 	ID          string             `json:"id,omitempty" bson:"-"`
 	IDUser      string             `json:"id_user,omitempty" bson:"id_user,omitempty"`
 	Description string             `json:"description,omitempty"`
-	Price       int                `json:"price,omitempty"`
-	Cost        int                `json:"cost,omitempty"`
-	Status      ServiceStatus      `json:"status,omitempty"`
+	Price       float32            `json:"price,omitempty" bson:"-"`
+	Cost        float32            `json:"cost,omitempty" bson:"-"`
+	PriceInt    int                `json:"-" bson:"price"`
+	CostInt     int                `json:"-" bson:"cost"`
+	Status      ServiceStatus      `json:"-"`
 }
 
 type DetailService struct {
-	Description string `json:"description,omitempty"`
-	Price       int    `json:"price,omitempty"`
-	Cost        int    `json:"cost,omitempty"`
+	Description string  `json:"description,omitempty"`
+	Price       float32 `json:"price,omitempty" bson:"-"`
+	Cost        float32 `json:"cost,omitempty" bson:"-"`
+	PriceInt    int     `json:"-" bson:"price"`
+	CostInt     int     `json:"-" bson:"cost"`
 }
 
 type EventCustomer struct {
@@ -54,6 +58,7 @@ type Event struct {
 	IDUser       string             `json:"id_user,omitempty" bson:"id_user,omitempty"`
 	Customer     EventCustomer      `json:"customer,omitempty"`
 	EventType    EventType          `json:"event_type,omitempty"`
+	Date         string             `json:"date,omitempty"`
 	Datetime     time.Time          `json:"datetime,omitempty"`
 	RegisterDate time.Time          `json:"register_date,omitempty"`
 	Professional string             `json:"professional,omitempty"`

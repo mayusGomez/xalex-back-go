@@ -40,7 +40,7 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 		}, nil
 	}
 
-	log.Println("IDService:", IDUser)
+	log.Println("IDUser:", IDUser)
 	log.Println("filterField:", filterField)
 	log.Println("filterData:", filterData)
 	log.Println("pageNumberQ:", pageNumberQ)
