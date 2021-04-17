@@ -7,15 +7,15 @@ import (
 )
 
 const (
-	InactiveServStatus ServiceStatus = 0
+	InactiveServStatus ServiceStatus = 2
 	ActiveServStatus   ServiceStatus = 1
 
-	CancelAppointStatus   EventStatus = 0
-	PendingAppointStatus  EventStatus = 1
-	ExecutedAppointStatus EventStatus = 2
+	CancelAppointStatus   EventStatus = 1
+	PendingAppointStatus  EventStatus = 2
+	ExecutedAppointStatus EventStatus = 3
 
-	AppointmentEvent EventType = 0
-	BillingEvent     EventType = 1
+	AppointmentEvent EventType = 1
+	BillingEvent     EventType = 2
 )
 
 type EventStatus int
