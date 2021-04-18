@@ -57,10 +57,10 @@ type Event struct {
 	ID           string             `json:"id,omitempty" bson:"-"`
 	IDUser       string             `json:"id_user,omitempty" bson:"id_user,omitempty"`
 	Customer     EventCustomer      `json:"customer,omitempty"`
-	EventType    EventType          `json:"event_type,omitempty"`
+	EventType    EventType          `json:"event_type,omitempty" bson:"event_type"`
 	Date         string             `json:"date,omitempty"`
-	Datetime     time.Time          `json:"datetime,omitempty"`
-	RegisterDate time.Time          `json:"register_date,omitempty"`
+	Datetime     time.Time          `json:"datetime,omitempty" bson:"date_time"`
+	RegisterDate time.Time          `json:"register_date,omitempty" bson:"register_date"`
 	Professional string             `json:"professional,omitempty"`
 	Status       EventStatus        `json:"status,omitempty"`
 	Note         string             `json:"note,omitempty"`

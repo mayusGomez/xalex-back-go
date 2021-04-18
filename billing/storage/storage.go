@@ -13,3 +13,10 @@ type ServiceStorage interface {
 	Create(service *billing.Service) error
 	Update(service *billing.Service) error
 }
+
+// EventStorage interface
+type EventStorage interface {
+	Connect() error
+	Disconnect()
+	Create(event *billing.Event) error
+}
