@@ -69,12 +69,12 @@ func (s *ServiceMongoStorage) Get(idService string) (billing.Service, error) {
 	return service, nil
 }
 
-func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Service, error) {
+func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Service, int64, error) {
 
 	db := s.Client.Database(billing.DBName)
 	coll := db.Collection(billing.ServiceCollection)
 
-	skips := pageSize * (pageNumber - 1)
+	skips := pageSize * (pageNumber)
 
 	var services []billing.Service
 	findOpts := options.Find()
@@ -90,7 +90,7 @@ func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern strin
 	cur, err := coll.Find(s.Context, filter, findOpts)
 	if err != nil {
 		log.Println("Error, Find:", err)
-		return []billing.Service{}, nil
+		return []billing.Service{}, 0, nil
 	}
 
 	for cur.Next(s.Context) {
@@ -104,7 +104,9 @@ func (s *ServiceMongoStorage) GetByPage(IDUser, filterField, filterPattern strin
 		services = append(services, service)
 	}
 
-	return services, nil
+	itemCount, _ := coll.CountDocuments(s.Context, filter)
+
+	return services, itemCount, nil
 }
 
 func (s *ServiceMongoStorage) Create(service *billing.Service) error {
@@ -146,10 +148,9 @@ func (s *ServiceMongoStorage) Update(service *billing.Service) error {
 
 	_, err = coll.UpdateOne(
 		s.Context,
-		bson.M{"_id": service.IDmgo},
+		bson.M{"_id": service.IDmgo, "id_user": service.IDUser},
 		bson.D{
 			{"$set", bson.D{
-				{"id_user", service.IDUser},
 				{"description", service.Description},
 				{"price", service.PriceInt},
 				{"cost", service.CostInt},

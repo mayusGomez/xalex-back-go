@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -11,6 +12,9 @@ import (
 
 func CreateService(service *billing.Service, s storage.ServiceStorage) error {
 
+	if service.IDUser == "" {
+		return errors.New("Wrong input values")
+	}
 	service.Description = strings.ToUpper(service.Description)
 	service.SetMoneyToInt()
 	service.Status = billing.ActiveServStatus
@@ -24,21 +28,31 @@ func CreateService(service *billing.Service, s storage.ServiceStorage) error {
 
 }
 
-func GetByPage(IDUser, filterField, fielterData string, pageNumber, pageSize int64, s storage.ServiceStorage) ([]billing.Service, error) {
+func GetByPage(IDUser, filterField, fielterData string, pageNumber, pageSize int64, s storage.ServiceStorage) ([]billing.Service, int64, error) {
 
-	services, err := s.GetByPage(IDUser, filterField, fielterData, pageNumber, pageSize)
+	fielterData = strings.ToUpper(fielterData)
+	services, total, err := s.GetByPage(IDUser, filterField, fielterData, pageNumber, pageSize)
 	for _, service := range services {
 		service.SetMoneyToFloat()
 	}
 
+	for i, service := range services {
+		service.SetMoneyToFloat()
+		services[i] = service
+	}
+
 	if err != nil {
 		fmt.Println(err)
-		return nil, err
+		return nil, 0, err
 	}
-	return services, nil
+	return services, total, nil
 }
 
 func Update(service *billing.Service, s storage.ServiceStorage) error {
+
+	if service.IDUser == "" {
+		return errors.New("Wrong input values")
+	}
 
 	service.Description = strings.ToUpper(service.Description)
 	service.SetMoneyToInt()

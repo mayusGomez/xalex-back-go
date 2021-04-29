@@ -44,7 +44,7 @@ type DetailService struct {
 
 type EventCustomer struct {
 	ID              string `json:"id,omitempty" bson:"-"`
-	Name            string `json:"name,omitempty" bson:"name"`
+	Name            string `json:"name,omitempty" bson:"name,omitempty"`
 	LastName        string `json:"last_name,omitempty" bson:"last_name,omitempty"`
 	MainMobilePhone string `json:"main_mobile_phone,omitempty" bson:"main_mobile_phone,omitempty"`
 	Email           string `json:"email,omitempty" bson:"email,omitempty"`
@@ -56,13 +56,13 @@ type Event struct {
 	IDmgo        primitive.ObjectID `bson:"_id" json:"-"`
 	ID           string             `json:"id,omitempty" bson:"-"`
 	IDUser       string             `json:"id_user,omitempty" bson:"id_user,omitempty"`
-	Customer     EventCustomer      `json:"customer,omitempty"`
+	Customer     *EventCustomer     `json:"customer,omitempty" bson:"customer,omitempty"`
 	EventType    EventType          `json:"event_type,omitempty" bson:"event_type"`
-	Date         string             `json:"date,omitempty"`
-	Datetime     time.Time          `json:"datetime,omitempty" bson:"date_time"`
-	RegisterDate time.Time          `json:"register_date,omitempty" bson:"register_date"`
-	Professional string             `json:"professional,omitempty"`
-	Status       EventStatus        `json:"status,omitempty"`
-	Note         string             `json:"note,omitempty"`
-	Services     []DetailService    `json:"services,omitempty"`
+	Date         string             `json:"-" bson:"date,omitempty"`
+	Datetime     time.Time          `json:"date_time,omitempty" bson:"date_time,omitempty"`
+	RegisterDate time.Time          `json:"register_date,omitempty" bson:"register_date,omitempty"`
+	Professional string             `json:"professional,omitempty" bson:"professional,omitempty"`
+	Status       EventStatus        `json:"status,omitempty" bson:"status,omitempty"`
+	Note         string             `json:"note,omitempty" bson:"note,omitempty"`
+	Services     []DetailService    `json:"services,omitempty" bson:"services,omitempty"`
 }

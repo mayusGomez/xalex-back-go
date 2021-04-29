@@ -85,8 +85,7 @@ func (s *EventMongoStorage) Update(event *billing.Event) error {
 				{"customer", event.Customer},
 				{"event_type", event.EventType},
 				{"date", event.Date},
-				{"datetime", event.Datetime},
-				{"register_date", event.RegisterDate},
+				{"date_time", event.Datetime},
 				{"professional", event.Professional},
 				{"status", event.Status},
 				{"note", event.Note},
@@ -108,9 +107,9 @@ func (s *EventMongoStorage) Patch(event *billing.Event) error {
 	coll := db.Collection(billing.EventCollection)
 	var err error
 
-	if event.ID == "" {
-		log.Fatal("Error: when try to patch Event, no ID received")
-		return errors.New("Error: when try to patch Event, no ID received")
+	if event.ID == "" || event.IDUser == "" {
+		log.Fatal("Error: when try to patch Event, no ID or IDUser received")
+		return errors.New("Error: when try to patch Event, no ID or IDUser received")
 	}
 
 	idObj, err := primitive.ObjectIDFromHex(event.ID)
@@ -120,7 +119,7 @@ func (s *EventMongoStorage) Patch(event *billing.Event) error {
 	}
 
 	updateBson := bson.D{}
-	if event.Customer != (billing.EventCustomer{}) {
+	if event.Customer != nil {
 		updateBson = append(updateBson, bson.E{"customer", event.Customer})
 	}
 
@@ -154,7 +153,7 @@ func (s *EventMongoStorage) Patch(event *billing.Event) error {
 
 	_, err = coll.UpdateOne(
 		s.Context,
-		bson.M{"_id": idObj},
+		bson.M{"_id": idObj, "id_user": event.IDUser},
 		bson.D{
 			{"$set", updateBson},
 		},
@@ -198,7 +197,7 @@ func (s *EventMongoStorage) Get(idEvent string) (billing.Event, error) {
 	return event, nil
 }
 
-func (s *EventMongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Event, error) {
+func (s *EventMongoStorage) GetEventsByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Event, error) {
 
 	db := s.Client.Database(billing.DBName)
 	coll := db.Collection(billing.EventCollection)
