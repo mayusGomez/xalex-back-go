@@ -15,7 +15,14 @@ import (
 	"github.com/mayusGomez/xalex/customers"
 	"github.com/mayusGomez/xalex/customers/services"
 	"github.com/mayusGomez/xalex/customers/storage/mongo"
+	"github.com/mayusGomez/xalex/shared"
 )
+
+type response struct {
+	Data     []customers.Customer `json:"data,omitempty"`
+	ErrorMsg string               `json:"error_msg,omitempty"`
+	Paging   *shared.Paging       `json:"paging,omitempty"`
+}
 
 func main() {
 	lambda.Start(LambdaHandler)
@@ -32,7 +39,7 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	pageNumber, _ := strconv.ParseInt(pageNumberQ, 10, 64)
 	pageSize, _ := strconv.ParseInt(pageSizeQ, 10, 64)
 
-	if IDUser == "" || pageNumber == 0 || pageSize == 0 {
+	if IDUser == "" || pageNumber < 0 || pageSize == 0 {
 		log.Println("Error, pageNumber or pageSize incorrect")
 		return events.APIGatewayProxyResponse{
 			Body:       "",
@@ -57,17 +64,17 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse([]customers.Customer{}),
+			Body:       createErrorResponse("Processing error"),
 			StatusCode: http.StatusInternalServerError,
 		}, nil
 	}
 	defer storage.Disconnect()
 
-	customersData, err := services.GetByPage(IDUser, filterField, filterData, pageNumber, pageSize, &storage)
+	customersData, totalData, err := services.GetByPage(IDUser, filterField, filterData, pageNumber, pageSize, &storage)
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse([]customers.Customer{}),
+			Body:       createErrorResponse("Processing error"),
 			StatusCode: http.StatusInternalServerError,
 		}, nil
 	}
@@ -76,20 +83,44 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 
 	if len(customersData) == 0 {
 		return events.APIGatewayProxyResponse{
-			Body:       createResponse([]customers.Customer{}),
+			Body:       createResponse(customersData, 0),
 			StatusCode: http.StatusNotFound,
 		}, nil
 	}
 
 	return events.APIGatewayProxyResponse{
-		Body:       createResponse(customersData),
+		Body:       createResponse(customersData, totalData),
 		StatusCode: http.StatusOK,
 	}, nil
 }
 
-func createResponse(customers []customers.Customer) string {
+func createResponse(customersData []customers.Customer, total int64) string {
 
-	data, _ := json.Marshal(customers)
+	res := &response{
+		Data: customersData,
+		Paging: &shared.Paging{
+			Total: total,
+		},
+	}
+
+	log.Printf("response: %+v \n", res)
+
+	data, err := json.Marshal(res)
+	if err != nil {
+		log.Println("Error, marshal response:", err)
+	}
+	log.Println("data:", string(data))
+
+	return string(data)
+
+}
+
+func createErrorResponse(msg string) string {
+
+	res := &response{
+		ErrorMsg: msg,
+	}
+	data, _ := json.Marshal(res)
 	return string(data)
 
 }

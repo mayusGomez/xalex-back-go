@@ -32,9 +32,6 @@ func GetByPage(IDUser, filterField, fielterData string, pageNumber, pageSize int
 
 	fielterData = strings.ToUpper(fielterData)
 	services, total, err := s.GetByPage(IDUser, filterField, fielterData, pageNumber, pageSize)
-	for _, service := range services {
-		service.SetMoneyToFloat()
-	}
 
 	for i, service := range services {
 		service.SetMoneyToFloat()

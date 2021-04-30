@@ -14,6 +14,9 @@ func validateCreateUser(customer *customers.Customer) (string, error) {
 	if customer.ID != "" {
 		return "Code invalid", errors.New("Customer with ID")
 	}
+	if customer.IDUser == "" {
+		return "Empty UserId", errors.New("Empty UserId")
+	}
 	if len(customer.Name) == 0 {
 		return "Name invalid", errors.New("Customer without Name")
 	}
@@ -45,17 +48,21 @@ func CreateUser(customer *customers.Customer, s storage.Storage) error {
 
 }
 
-func GetByPage(IDUser, filterField, fielterData string, pageNumber, pageSize int64, s storage.Storage) ([]customers.Customer, error) {
+func GetByPage(IDUser, filterField, fielterData string, pageNumber, pageSize int64, s storage.Storage) ([]customers.Customer, int64, error) {
 
-	users, err := s.GetByPage(IDUser, filterField, fielterData, pageNumber, pageSize)
+	users, total, err := s.GetByPage(IDUser, filterField, fielterData, pageNumber, pageSize)
 	if err != nil {
 		fmt.Println(err)
-		return nil, err
+		return nil, 0, err
 	}
-	return users, nil
+	return users, total, nil
 }
 
 func Update(customer *customers.Customer, s storage.Storage) error {
+
+	if customer.IDUser == "" {
+		return errors.New("Wrong input values")
+	}
 
 	err := s.Update(customer)
 	if err != nil {
@@ -66,12 +73,18 @@ func Update(customer *customers.Customer, s storage.Storage) error {
 
 }
 
-func GetCustomer(customerId string, s storage.Storage) (customers.Customer, error) {
+func GetCustomer(userId, customerId string, s storage.Storage) (customers.Customer, error) {
 
 	customer, err := s.Get(customerId)
 	if err != nil {
 		fmt.Println("Error, Receive err from storage", err)
 		return customers.Customer{}, err
 	}
+
+	if customer.IDUser != userId {
+		fmt.Println("Error, user not related", err)
+		return customers.Customer{}, nil
+	}
+
 	return customer, nil
 }

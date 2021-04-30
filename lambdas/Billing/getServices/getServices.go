@@ -81,7 +81,7 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	}
 
 	log.Println("Result len services:", len(servicesData))
-	log.Println("Result servicesData:", servicesData)
+	// log.Println("Result servicesData:", servicesData)
 
 	if len(servicesData) == 0 {
 		return events.APIGatewayProxyResponse{

@@ -69,12 +69,12 @@ func (s *MongoStorage) Get(idCustomer string) (customers.Customer, error) {
 }
 
 // GetByPage customers of an User
-func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]customers.Customer, error) {
+func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, pageNumber, pageSize int64) ([]customers.Customer, int64, error) {
 
 	db := s.Client.Database(shared.DBName)
 	coll := db.Collection(shared.CustommerCollection)
 
-	skips := pageSize * (pageNumber - 1)
+	skips := pageSize * (pageNumber)
 
 	var customersList []customers.Customer
 	findOpts := options.Find()
@@ -90,7 +90,7 @@ func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, page
 	cur, err := coll.Find(s.Context, filter, findOpts)
 	if err != nil {
 		log.Println("Error, Find:", err)
-		return []customers.Customer{}, nil
+		return []customers.Customer{}, 0, nil
 	}
 
 	for cur.Next(s.Context) {
@@ -104,7 +104,9 @@ func (s *MongoStorage) GetByPage(IDUser, filterField, filterPattern string, page
 		customersList = append(customersList, customer)
 	}
 
-	return customersList, nil
+	itemCount, _ := coll.CountDocuments(s.Context, filter)
+
+	return customersList, itemCount, nil
 }
 
 // Create customer data
@@ -147,10 +149,9 @@ func (s *MongoStorage) Update(customer *customers.Customer) error {
 
 	_, err = coll.UpdateOne(
 		s.Context,
-		bson.M{"_id": customer.IDmgo},
+		bson.M{"_id": customer.IDmgo, "id_user": customer.IDUser},
 		bson.D{
 			{"$set", bson.D{
-				{"id_user", customer.IDUser},
 				{"name", customer.Name},
 				{"last_name", customer.LastName},
 				{"main_mobile_phone", customer.MainMobilePhone},

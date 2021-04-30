@@ -25,6 +25,8 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 
 	customerId := request.PathParameters["customerId"]
 	log.Printf("request.customerId: %+v", customerId)
+	userId := request.QueryStringParameters["userId"]
+	log.Printf("request.userId: %+v", userId)
 
 	if customerId == "" {
 		return events.APIGatewayProxyResponse{
@@ -50,7 +52,7 @@ func LambdaHandler(request events.APIGatewayProxyRequest) (events.APIGatewayProx
 	}
 	defer storage.Disconnect()
 
-	customer, err := services.GetCustomer(customerId, &storage)
+	customer, err := services.GetCustomer(userId, customerId, &storage)
 	if err != nil {
 		fmt.Println(err)
 		return events.APIGatewayProxyResponse{
