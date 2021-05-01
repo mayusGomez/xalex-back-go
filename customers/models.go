@@ -13,10 +13,10 @@ type Notes struct {
 }
 
 type Date struct {
-	Date  time.Time `json:"date,omitempty"`
-	Day   int       `json:"day,omitempty"`
-	Month int       `json:"month,omitempty"`
-	Year  int       `json:"year,omitempty"`
+	Date  int `json:"date,omitempty"`
+	Day   int `json:"day,omitempty"`
+	Month int `json:"month,omitempty"`
+	Year  int `json:"year,omitempty"`
 }
 
 type AuxMobilePhone struct {
@@ -45,6 +45,6 @@ type Customer struct {
 	IDNumber        string             `json:"id_number,omitempty" bson:"id_number,omitempty"`
 	Segment         string             `json:"segment,omitempty" bson:"segment,omitempty"`
 	Location        *Location          `json:"location,omitempty" bson:"location,omitempty"`
-	BirthDate       *Date              `json:"birth_date,omitempty"`
+	BirthDate       *Date              `json:"birth_date,omitempty" bson:"birth_date,omitempty"`
 	Notes           []Notes            `json:"notes,omitempty" bson:"notes,omitempty"`
 }
