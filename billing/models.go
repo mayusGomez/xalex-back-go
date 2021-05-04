@@ -16,6 +16,7 @@ const (
 
 	AppointmentEvent EventType = 1
 	BillingEvent     EventType = 2
+	InteractionEvent EventType = 3
 )
 
 type EventStatus int
@@ -59,10 +60,12 @@ type Event struct {
 	Customer     *EventCustomer     `json:"customer,omitempty" bson:"customer,omitempty"`
 	EventType    EventType          `json:"event_type,omitempty" bson:"event_type"`
 	Date         string             `json:"-" bson:"date,omitempty"`
-	Datetime     time.Time          `json:"date_time,omitempty" bson:"date_time,omitempty"`
+	StartDate    time.Time          `json:"date_date,omitempty" bson:"date_time,omitempty"`
+	EndDate      time.Time          `json:"end_date,omitempty"`
 	RegisterDate time.Time          `json:"register_date,omitempty" bson:"register_date,omitempty"`
 	Professional string             `json:"professional,omitempty" bson:"professional,omitempty"`
 	Status       EventStatus        `json:"status,omitempty" bson:"status,omitempty"`
 	Note         string             `json:"note,omitempty" bson:"note,omitempty"`
 	Services     []DetailService    `json:"services,omitempty" bson:"services,omitempty"`
+	Description  string             `json:"description,omitempty"`
 }
