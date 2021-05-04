@@ -5,4 +5,5 @@ const (
 
 	ServiceCollection = "service"
 	EventCollection   = "event"
+	QuoteCollection   = "quote"
 )

@@ -14,11 +14,11 @@ import (
 func CreateEvent(event *billing.Event, s storage.EventStorage) error {
 
 	log.Printf("Service CreateEvent, event: %+v \n", event)
-	if event.Datetime == (time.Time{}) {
-		log.Println("datime empty, ", event.Datetime)
-		event.Datetime = time.Now()
+	if event.StartDate == (time.Time{}) {
+		log.Println("datime empty, ", event.StartDate)
+		event.StartDate = time.Now()
 	}
-	event.Date = event.Datetime.Format("20060102")
+	event.Date = event.StartDate.Format("20060102")
 	event.Professional = strings.ToUpper(event.Professional)
 	event.Status = billing.PendingAppointStatus
 	event.RegisterDate = time.Now()
@@ -74,7 +74,7 @@ func GetEvensByPage(IDUser, filterField, fielterData string, pageNumber, pageSiz
 
 func UpdateEvent(event *billing.Event, s storage.EventStorage) error {
 
-	event.Date = event.Datetime.Format("20060102")
+	event.Date = event.StartDate.Format("20060102")
 	event.Professional = strings.ToUpper(event.Professional)
 	event.SetMoneyToInt()
 
@@ -102,8 +102,8 @@ func PatchEvent(event *billing.Event, s storage.EventStorage) error {
 		return errors.New("Patch event must have ID and userId")
 	}
 
-	if event.Datetime != (time.Time{}) {
-		event.Date = event.Datetime.Format("20060102")
+	if event.StartDate != (time.Time{}) {
+		event.Date = event.StartDate.Format("20060102")
 	}
 	if event.Professional != "" {
 		event.Professional = strings.ToUpper(event.Professional)

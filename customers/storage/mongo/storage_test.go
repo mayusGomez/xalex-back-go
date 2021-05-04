@@ -206,7 +206,7 @@ func TestMongoStorage_GetByPage(t *testing.T) {
 				Client:     tt.fields.Client,
 				Context:    tt.fields.Context,
 			}
-			got, err := s.GetByPage(tt.args.IDUser, tt.args.filterField, tt.args.filterPattern, tt.args.pageNumber, tt.args.pageSize)
+			got, _, err := s.GetByPage(tt.args.IDUser, tt.args.filterField, tt.args.filterPattern, tt.args.pageNumber, tt.args.pageSize)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MongoStorage.GetByPage() error = %v, wantErr %v", err, tt.wantErr)
 				return

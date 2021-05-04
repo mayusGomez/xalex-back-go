@@ -85,7 +85,7 @@ func (s *EventMongoStorage) Update(event *billing.Event) error {
 				{"customer", event.Customer},
 				{"event_type", event.EventType},
 				{"date", event.Date},
-				{"date_time", event.Datetime},
+				{"start_date", event.StartDate},
 				{"professional", event.Professional},
 				{"status", event.Status},
 				{"note", event.Note},
@@ -131,8 +131,8 @@ func (s *EventMongoStorage) Patch(event *billing.Event) error {
 		updateBson = append(updateBson, bson.E{"date", event.Date})
 	}
 
-	if event.Datetime != (time.Time{}) {
-		updateBson = append(updateBson, bson.E{"date_time", event.Datetime})
+	if event.StartDate != (time.Time{}) {
+		updateBson = append(updateBson, bson.E{"date_time", event.StartDate})
 	}
 
 	if event.Professional != "" {

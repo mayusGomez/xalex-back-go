@@ -17,11 +17,18 @@ const (
 	AppointmentEvent EventType = 1
 	BillingEvent     EventType = 2
 	InteractionEvent EventType = 3
+
+	CanceledQuote  QuoteStatus = 1
+	StartedQuote   QuoteStatus = 2
+	FinalizedQuote QuoteStatus = 3
+	PendingQuote   QuoteStatus = 4
+	DiscartedQuote QuoteStatus = 5
 )
 
 type EventStatus int
 type ServiceStatus int
 type EventType int
+type QuoteStatus int
 
 type Service struct {
 	IDmgo       primitive.ObjectID `bson:"_id" json:"-"`
@@ -60,7 +67,7 @@ type Event struct {
 	Customer     *EventCustomer     `json:"customer,omitempty" bson:"customer,omitempty"`
 	EventType    EventType          `json:"event_type,omitempty" bson:"event_type"`
 	Date         string             `json:"-" bson:"date,omitempty"`
-	StartDate    time.Time          `json:"date_date,omitempty" bson:"date_time,omitempty"`
+	StartDate    time.Time          `json:"start_date,omitempty" bson:"date_time,omitempty"`
 	EndDate      time.Time          `json:"end_date,omitempty"`
 	RegisterDate time.Time          `json:"register_date,omitempty" bson:"register_date,omitempty"`
 	Professional string             `json:"professional,omitempty" bson:"professional,omitempty"`
@@ -68,4 +75,24 @@ type Event struct {
 	Note         string             `json:"note,omitempty" bson:"note,omitempty"`
 	Services     []DetailService    `json:"services,omitempty" bson:"services,omitempty"`
 	Description  string             `json:"description,omitempty"`
+}
+
+type Notes struct {
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	UserName  string    `json:"user_name,omitempty"`
+	Detail    string    `json:"detail,omitempty"`
+}
+
+type Quote struct {
+	IDmgo        primitive.ObjectID `bson:"_id" json:"-"`
+	ID           string             `json:"id,omitempty" bson:"-"`
+	Code         string             `json:"code,omitempty"`
+	RegisterDate time.Time          `json:"register_date,omitempty"`
+	IDUser       string             `json:"id_user,omitempty" bson:"id_user,omitempty"`
+	Customer     *EventCustomer     `json:"customer,omitempty" bson:"customer,omitempty"`
+	Professional string             `json:"professional,omitempty" bson:"professional,omitempty"`
+	Status       QuoteStatus        `json:"status,omitempty"`
+	Description  string             `json:"description,omitempty"`
+	Notes        []Notes            `json:"notes,omitempty" bson:"notes,omitempty"`
+	Services     []DetailService    `json:"services,omitempty"`
 }

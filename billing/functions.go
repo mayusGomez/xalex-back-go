@@ -37,3 +37,23 @@ func (event *Event) SetMoneyToFloat() {
 		event.Services[i] = detail
 	}
 }
+
+func (quote *Quote) SetMoneyToInt() {
+
+	for i, detail := range quote.Services {
+		detail.PriceInt = shared.MoneyToInt(detail.Price)
+		detail.CostInt = shared.MoneyToInt(detail.Cost)
+		quote.Services[i] = detail
+
+	}
+
+}
+
+func (quote *Quote) SetMoneyToFloat() {
+
+	for i, detail := range quote.Services {
+		detail.Price = shared.IntToMoney(detail.PriceInt)
+		detail.Cost = shared.IntToMoney(detail.CostInt)
+		quote.Services[i] = detail
+	}
+}
