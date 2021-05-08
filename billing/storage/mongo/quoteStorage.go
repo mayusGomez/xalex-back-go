@@ -155,7 +155,7 @@ func (s *QuoteMongoStorage) Get(id string) (billing.Quote, error) {
 	return quote, nil
 }
 
-func (s *QuoteMongoStorage) GetQuotesByPage(IDUser, quoteStatus []billing.QuoteStatus, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Quote, int64, error) {
+func (s *QuoteMongoStorage) GetQuotesByPage(IDUser string, quoteStatus []billing.QuoteStatus, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Quote, int64, error) {
 
 	db := s.Client.Database(billing.DBName)
 	coll := db.Collection(billing.QuoteCollection)
@@ -173,11 +173,7 @@ func (s *QuoteMongoStorage) GetQuotesByPage(IDUser, quoteStatus []billing.QuoteS
 		filter = append(filter, bson.E{filterField, primitive.Regex{Pattern: filterPattern, Options: ""}})
 	}
 	if len(quoteStatus) > 0 {
-		statusArr := bson.A{}
-		for _, status := range quoteStatus {
-			statusArr = append(statusArr, status)
-		}
-		filter = append(filter, bson.E{"$in", statusArr})
+		filter = append(filter, bson.E{"status", bson.M{"$in": quoteStatus}})
 	}
 
 	cur, err := coll.Find(s.Context, filter, findOpts)

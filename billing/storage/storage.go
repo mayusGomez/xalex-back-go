@@ -31,7 +31,7 @@ type QuoteStorage interface {
 	Disconnect()
 	Create(quote *billing.Quote) error
 	Get(id string) (billing.Quote, error)
-	GetQuotesByPage(IDUser, quoteStatus []billing.QuoteStatus, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Quote, int64, error)
+	GetQuotesByPage(IDUser string, quoteStatus []billing.QuoteStatus, filterField, filterPattern string, pageNumber, pageSize int64) ([]billing.Quote, int64, error)
 	Update(quote *billing.Quote) error
 	AddNote(userId, id string, note *billing.Notes) error
 }

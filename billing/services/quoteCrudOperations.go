@@ -18,11 +18,16 @@ func CreateQuote(quote *billing.Quote, s storage.QuoteStorage) error {
 		return errors.New("Wrong input values")
 	}
 
-	hex_num := strconv.FormatInt(quote.RegisterDate.UnixNano(), 16)
-	quote.RegisterDate = time.Now()
+	now := time.Now()
+	hex_num := strconv.FormatInt(now.UnixNano(), 16)
+	quote.RegisterDate = now
 	quote.Professional = strings.ToUpper(quote.Professional)
 	quote.Status = billing.PendingQuote
 	quote.Code = hex_num
+
+	for _, note := range quote.Notes {
+		note.CreatedAt = time.Now()
+	}
 
 	err := s.Create(quote)
 	if err != nil {
@@ -33,7 +38,7 @@ func CreateQuote(quote *billing.Quote, s storage.QuoteStorage) error {
 
 }
 
-func GetQuotesByPage(IDUser, quoteStatus []billing.QuoteStatus, filterField, fielterData string, pageNumber, pageSize int64, s storage.QuoteStorage) ([]billing.Quote, int64, error) {
+func GetQuotesByPage(IDUser string, quoteStatus []billing.QuoteStatus, filterField, fielterData string, pageNumber, pageSize int64, s storage.QuoteStorage) ([]billing.Quote, int64, error) {
 
 	fielterData = strings.ToUpper(fielterData)
 	quotes, total, err := s.GetQuotesByPage(IDUser, quoteStatus, filterField, fielterData, pageNumber, pageSize)
@@ -92,6 +97,8 @@ func AddQuoteNotes(userId, id string, note *billing.Notes, s storage.QuoteStorag
 	if userId == "" {
 		return errors.New("Wrong input values")
 	}
+
+	note.CreatedAt = time.Now()
 
 	err := s.AddNote(userId, id, note)
 	if err != nil {
