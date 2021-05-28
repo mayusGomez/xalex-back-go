@@ -5,9 +5,14 @@ import (
 )
 
 type Location struct {
-	country string `json:"country,omitempty"`
-	city    string `json:"city,omitempty"`
-	address string `json:"address,omitempty"`
+	Country string `json:"country,omitempty"`
+	City    string `json:"city,omitempty"`
+	Address string `json:"address,omitempty"`
+}
+
+type Professional struct {
+	Code int    `json:"code,omitempty"`
+	Name string `json:"name,omitempty"`
 }
 
 type User struct {
@@ -21,5 +26,5 @@ type User struct {
 	IDType        string             `json:"id_type,omitempty" bson:"id_type,omitempty"`
 	IDCode        string             `json:"id_code,omitempty" bson:"id_code,omitempty"`
 	Location      *Location          `json:"location,omitempty" bson:"location,omitempty"`
-	Proffesionals []string           `json:"proffesionals,omitempty" bson:"proffesionals,omitempty"`
+	Professionals []Professional     `json:"professionals,omitempty" bson:"professionals,omitempty"`
 }
